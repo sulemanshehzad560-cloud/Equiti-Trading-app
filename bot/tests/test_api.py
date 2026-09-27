@@ -62,6 +62,9 @@ class APITests(unittest.TestCase):
         pos = json.loads(self.call("/api/positions")[1])
         self.assertEqual(pos[0]["side"], "BUY")
         self.assertEqual(pos[0]["digits"], 5)
+        self.assertGreater(pos[0]["price"], 0)
+        self.assertEqual(s["risk"]["max_open"], 3)
+        self.assertEqual({x["name"] for x in s["strategies"]}, {"trend", "breakout"})
         journal = json.loads(self.call("/api/journal?n=50")[1])
         self.assertIn("open", [j["action"] for j in journal])
 

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Equiti Trader</title>
-  <meta name="description" content="Monitor and control your automated Equiti MT5 trading bot.">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Terminal-grade control desk for your automated Equiti MT5 trading bot.">
+  <meta name="theme-color" content="#07090d">
   <meta name="color-scheme" content="dark light">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -16,124 +16,183 @@
 </head>
 <body>
   <header class="top">
-    <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>Equiti Trader</span></div>
-    <span id="conn" class="pill">Not connected</span>
-    <button id="openSettings" class="icon-btn" aria-label="Settings">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M3 17v2h6v-2zm0-12v2h10V5zm10 16v-2h8v-2h-8v-2h-2v6zM7 9v2H3v2h4v2h2V9zm14 4v-2H11v2zm-6-4h2V7h4V5h-4V3h-2z"/></svg>
+    <div class="brand" aria-label="Equiti Trader">
+      <span class="brand-mark" aria-hidden="true">▌</span><span>equiti</span><span class="slash">/</span><span class="accent">trader</span><span class="cursor" aria-hidden="true"></span>
+    </div>
+    <div class="status-strip">
+      <span id="link" class="chip" title="Connection to the bot"><i class="led"></i><span id="linkText">OFFLINE</span></span>
+      <span id="server" class="chip hide-sm" title="MT5 server">MT5 -</span>
+      <span id="clock" class="chip hide-xs" title="UTC time">UTC --:--:--</span>
+    </div>
+    <button id="openSettings" class="icon-btn" aria-label="Settings (,)" title="Settings  [,]">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 17v2h6v-2zm0-12v2h10V5zm10 16v-2h8v-2h-8v-2h-2v6zM7 9v2H3v2h4v2h2V9zm14 4v-2H11v2zm-6-4h2V7h4V5h-4V3h-2z"/></svg>
     </button>
   </header>
 
+  <div class="tape" aria-label="Symbol ticker"><div id="tape" class="tape-track"></div></div>
+
+  <nav class="tabs" aria-label="Sections">
+    <button data-tab="desk" class="active"><b>01</b> Desk</button>
+    <button data-tab="book"><b>02</b> Book <span id="bookCount" class="count"></span></button>
+    <button data-tab="wire"><b>03</b> Wire</button>
+    <button data-tab="log"><b>04</b> Log</button>
+  </nav>
+
   <main id="main">
-    <section id="onboard" class="card onboard" hidden>
-      <h1>Connect your trading bot</h1>
-      <p>This app watches and controls the Equiti Trader bot running next to MetaTrader 5 on your PC or VPS.</p>
-      <ol>
-        <li>Start the bot: <code>python main.py run --mode demo</code></li>
-        <li>On the same PC, open <code>http://localhost:8787</code>. For your phone, share it over HTTPS (see README).</li>
-        <li>Open <b>Settings</b> here and paste the bot address and the access token the bot printed.</li>
+    <!-- first run -->
+    <section id="boot" class="panel boot" hidden>
+      <div class="panel-title">[ BOOT ]</div>
+      <pre class="term" id="bootLog"></pre>
+      <p>This app is the control desk for the <b>Equiti Trader</b> bot, which runs next to MetaTrader&nbsp;5 on your PC or VPS. The bot decides and trades. This app watches it and can pause it or pull the plug.</p>
+      <ol class="steps">
+        <li><code>python main.py run --mode demo</code> on the trading PC</li>
+        <li>Same PC: open <code>http://localhost:8787</code>. Phone: expose it over HTTPS (<code>cloudflared tunnel --url http://localhost:8787</code>)</li>
+        <li>Paste the address and the access token the bot printed into <b>Settings</b></li>
       </ol>
       <div class="row">
-        <button class="btn primary" data-action="settings">Open settings</button>
-        <button class="btn" data-action="sample">Try with sample data</button>
+        <button class="btn primary" data-action="settings">Connect bot</button>
+        <button class="btn" data-action="sample">Run on sample data</button>
       </div>
     </section>
 
-    <section id="tab-dashboard" class="tab">
-      <div class="grid">
-        <div class="card hero">
-          <div class="muted small">Equity</div>
-          <div id="equity" class="big">-</div>
-          <div class="kv">
-            <div><span class="muted">Balance</span><b id="balance">-</b></div>
-            <div><span class="muted">Today</span><b id="dayPnl">-</b></div>
-            <div><span class="muted">Open</span><b id="openCount">-</b></div>
+    <!-- 01 DESK -->
+    <section id="tab-desk" class="tab">
+      <div class="grid g-desk">
+        <article class="panel acct">
+          <div class="panel-title">[ ACCOUNT ] <span id="acctId" class="dim"></span></div>
+          <div class="equity-row">
+            <div>
+              <div class="label">EQUITY</div>
+              <div id="equity" class="equity num">-</div>
+              <div id="dayLine" class="num small">-</div>
+            </div>
+            <svg id="spark" class="spark" viewBox="0 0 200 60" preserveAspectRatio="none" aria-label="Equity this session"></svg>
           </div>
-          <div class="muted small" id="accountLine"></div>
-        </div>
-        <div class="card">
-          <div class="row between">
-            <h2>Bot</h2>
-            <span id="modeBadge" class="badge">-</span>
+          <dl class="stats">
+            <div><dt>BALANCE</dt><dd id="balance" class="num">-</dd></div>
+            <div><dt>FLOATING</dt><dd id="floating" class="num">-</dd></div>
+            <div><dt>DAY P&amp;L</dt><dd id="dayPnl" class="num">-</dd></div>
+            <div><dt>FREE MARGIN</dt><dd id="freeMargin" class="num">-</dd></div>
+          </dl>
+        </article>
+
+        <article class="panel engine">
+          <div class="panel-title">[ ENGINE ] <span id="modeTag" class="tag">-</span></div>
+          <div class="engine-state"><i id="stateLed" class="led big"></i><span id="stateText">-</span></div>
+          <div id="stateSub" class="dim small"></div>
+          <div class="kvs small">
+            <span>UPTIME <b id="uptime" class="num">-</b></span>
+            <span>TF <b id="tf">-</b></span>
+            <span>THRESH <b id="thresh" class="num">-</b></span>
           </div>
-          <div id="botState" class="state">-</div>
+          <div id="strats" class="strats"></div>
           <div class="row">
-            <button id="pauseBtn" class="btn">Pause new trades</button>
-            <button id="closeAllBtn" class="btn danger">Close all</button>
+            <button id="pauseBtn" class="btn" title="[p]">Pause entries</button>
+            <button id="flattenBtn" class="btn danger" title="Close every bot position">Flatten all</button>
           </div>
-          <p class="muted small">Pausing stops new entries. Open trades keep their stop loss and take profit.</p>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title">[ RISK ]</div>
+          <div class="gauge"><div class="gauge-head"><span>SLOTS</span><b id="slotsTxt" class="num">-</b></div><div class="bar"><span id="slotsBar"></span></div></div>
+          <div class="gauge"><div class="gauge-head"><span>DAILY LOSS BUDGET</span><b id="ddTxt" class="num">-</b></div><div class="bar"><span id="ddBar"></span></div></div>
+          <div class="kvs small">
+            <span>RISK/TRADE <b id="rpt" class="num">-</b></span>
+            <span>SL <b id="slx" class="num">-</b></span>
+            <span>TP <b id="tpx" class="num">-</b></span>
+            <span>R:R <b id="rr" class="num">-</b></span>
+            <span>MAX SPREAD <b id="spr" class="num">-</b></span>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title">[ PIPELINE ] <span class="dim">last 100 decisions: why it did or didn't trade</span></div>
+          <div id="pipeline" class="pipeline"></div>
+        </article>
+      </div>
+
+      <article class="panel">
+        <div class="panel-title">[ SYMBOLS ]</div>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>SYM</th><th>NEWS BIAS</th><th>STATE</th><th class="wide">LAST DECISION</th></tr></thead>
+            <tbody id="symRows"></tbody>
+          </table>
         </div>
-      </div>
-      <div class="card">
-        <h2>Symbols</h2>
-        <ul id="symbolList" class="list"></ul>
-      </div>
+      </article>
     </section>
 
-    <section id="tab-positions" class="tab" hidden>
-      <div id="positionsEmpty" class="card muted center" hidden>No open positions.</div>
-      <ul id="positionList" class="cards"></ul>
+    <!-- 02 BOOK -->
+    <section id="tab-book" class="tab" hidden>
+      <article class="panel">
+        <div class="panel-title">[ BOOK ] <span id="bookSummary" class="dim"></span></div>
+        <div id="bookEmpty" class="empty" hidden>Flat. Cash is a position too.</div>
+        <ul id="positions" class="positions"></ul>
+      </article>
     </section>
 
-    <section id="tab-news" class="tab" hidden>
-      <div class="card">
-        <h2>News filter by symbol</h2>
-        <ul id="newsSymbols" class="list"></ul>
+    <!-- 03 WIRE -->
+    <section id="tab-wire" class="tab" hidden>
+      <div class="grid g-wire">
+        <article class="panel">
+          <div class="panel-title">[ BIAS ] <span class="dim">-1 bearish · +1 bullish · veto at ±<span id="vetoTxt">0.35</span></span></div>
+          <ul id="bias" class="bias"></ul>
+        </article>
+        <article class="panel">
+          <div class="panel-title">[ CALENDAR ] <span class="dim">next 24h · high/medium</span></div>
+          <ul id="events" class="events"></ul>
+        </article>
       </div>
-      <div class="grid">
-        <div class="card">
-          <h2>Upcoming events</h2>
-          <ul id="events" class="list"></ul>
-        </div>
-        <div class="card">
-          <h2>Currency mood</h2>
-          <div id="currencies" class="chips"></div>
-        </div>
-      </div>
-      <div class="card">
-        <h2>Latest headlines</h2>
-        <ul id="headlines" class="list"></ul>
-      </div>
+      <article class="panel">
+        <div class="panel-title">[ FX MOOD ]</div>
+        <div id="mood" class="mood"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-title">[ WIRE ] <span class="dim">headlines, parsed into subject currency plus polarity</span></div>
+        <ul id="headlines" class="headlines"></ul>
+      </article>
     </section>
 
-    <section id="tab-activity" class="tab" hidden>
-      <div class="card">
-        <div class="row between"><h2>Decisions</h2><label class="small"><input type="checkbox" id="hideSkips" checked> Hide skips</label></div>
-        <ul id="journal" class="list"></ul>
-      </div>
+    <!-- 04 LOG -->
+    <section id="tab-log" class="tab" hidden>
+      <article class="panel">
+        <div class="panel-title row between">
+          <span>[ LOG ] <span class="dim">tail -f logs/journal.jsonl</span></span>
+          <span class="filters" role="group" aria-label="Filter">
+            <button data-f="all" class="f active">ALL</button><button data-f="open" class="f">OPEN</button><button data-f="close" class="f">CLOSE</button><button data-f="skip" class="f">SKIP</button>
+          </span>
+        </div>
+        <div id="log" class="log" role="log" aria-live="off"></div>
+      </article>
     </section>
 
     <p id="error" class="error" role="alert" hidden></p>
   </main>
 
-  <nav class="tabs" aria-label="Sections">
-    <button data-tab="dashboard" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4zm0 7h6v-5H4zm10 0h6v-9h-6zm0-16v5h6V4z"/></svg>Dashboard</button>
-    <button data-tab="positions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8v4h2V3h-8v2h4l-6 6-4-4-8 8z"/></svg>Positions</button>
-    <button data-tab="news"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v13a3 3 0 0 0 3 3H6a2 2 0 0 1-2-2zm15 4h2v9a1 1 0 0 1-2 0zM7 7v4h7V7zm0 6v1.5h7V13zm0 3.5V18h7v-1.5z"/></svg>News</button>
-    <button data-tab="activity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4v2h-2.6L14 22 10 6l-1.6 6H3z"/></svg>Activity</button>
-  </nav>
+  <footer class="foot">
+    <span><kbd>1</kbd>-<kbd>4</kbd> tabs · <kbd>p</kbd> pause · <kbd>r</kbd> refresh · <kbd>,</kbd> settings · <kbd>?</kbd> help</span>
+    <span id="lastSync" class="dim">never synced</span>
+  </footer>
 
   <dialog id="settings">
-    <form method="dialog" id="settingsForm">
-      <h2>Settings</h2>
-      <label>Bot address
-        <input id="botUrl" type="url" placeholder="https://your-tunnel.trycloudflare.com" autocomplete="off">
-        <span class="muted small">Leave empty when this app is opened from the bot itself (http://localhost:8787).</span>
+    <form method="dialog">
+      <div class="panel-title">[ CONFIG ]</div>
+      <label>BOT ADDRESS
+        <input id="botUrl" type="url" placeholder="https://your-tunnel.trycloudflare.com" autocomplete="off" spellcheck="false">
+        <span class="dim small">Leave empty when this page is served by the bot itself (localhost:8787).</span>
       </label>
-      <label>Access token
+      <label>ACCESS TOKEN
         <input id="botToken" type="password" autocomplete="off" spellcheck="false">
-        <span class="muted small">Printed by the bot on first start, and saved in its <code>.env</code> as DASHBOARD_TOKEN.</span>
+        <span class="dim small">Printed on the bot's first start. Stored as DASHBOARD_TOKEN in bot/.env.</span>
       </label>
-      <p id="testResult" class="small" aria-live="polite"></p>
+      <pre id="testResult" class="term small" aria-live="polite"></pre>
       <div class="row between">
-        <button type="button" id="testBtn" class="btn">Test</button>
-        <div class="row">
-          <button value="cancel" class="btn">Cancel</button>
-          <button value="save" id="saveBtn" class="btn primary">Save</button>
-        </div>
+        <button type="button" id="testBtn" class="btn">Handshake</button>
+        <span class="row"><button value="cancel" class="btn">Cancel</button><button value="save" id="saveBtn" class="btn primary">Save</button></span>
       </div>
       <hr>
       <div class="row between">
-        <button type="button" id="sampleBtn" class="btn">Use sample data</button>
+        <button type="button" id="sampleBtn" class="btn">Sample data</button>
         <button type="button" id="forgetBtn" class="btn danger">Forget token</button>
       </div>
     </form>
@@ -141,12 +200,27 @@
 
   <dialog id="confirm">
     <form method="dialog">
-      <h2 id="confirmTitle">Are you sure?</h2>
-      <p id="confirmText" class="muted"></p>
-      <div class="row end">
-        <button value="no" class="btn">Cancel</button>
-        <button value="yes" class="btn danger">Confirm</button>
-      </div>
+      <div class="panel-title" id="confirmTitle">[ CONFIRM ]</div>
+      <p id="confirmText"></p>
+      <label id="confirmTypeWrap" hidden>Type <code>FLATTEN</code> to confirm on a live account
+        <input id="confirmType" type="text" autocomplete="off" spellcheck="false">
+      </label>
+      <div class="row end"><button value="no" class="btn">Cancel</button><button value="yes" id="confirmYes" class="btn danger">Do it</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="help">
+    <form method="dialog">
+      <div class="panel-title">[ KEYS ]</div>
+      <table class="tbl keys">
+        <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></td><td>Desk · Book · Wire · Log</td></tr>
+        <tr><td><kbd>p</kbd></td><td>Pause or resume new entries</td></tr>
+        <tr><td><kbd>r</kbd></td><td>Refresh now</td></tr>
+        <tr><td><kbd>,</kbd></td><td>Settings</td></tr>
+        <tr><td><kbd>?</kbd></td><td>This help</td></tr>
+      </table>
+      <p class="dim small">Flatten has no hotkey on purpose.</p>
+      <div class="row end"><button class="btn primary">Got it</button></div>
     </form>
   </dialog>
 

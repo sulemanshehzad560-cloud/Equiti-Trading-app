@@ -64,7 +64,7 @@ class TraderAPI:
         b = self.engine.broker
         with self.engine.lock:
             return [{"ticket": p.ticket, "symbol": p.symbol, "side": "BUY" if p.side > 0 else "SELL",
-                     "volume": p.volume, "entry": p.entry, "sl": p.sl, "tp": p.tp, "profit": round(p.profit, 2),
+                     "volume": p.volume, "entry": p.entry, "sl": p.sl, "tp": p.tp, "profit": round(p.profit, 2), "price": p.price,
                      "opened": p.opened, "comment": p.comment, "digits": b.symbol_info(p.symbol).digits}
                     for p in b.positions()]
 

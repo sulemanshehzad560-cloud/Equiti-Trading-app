@@ -10,7 +10,7 @@ STARTS = {"EURUSD": 1.08, "GBPUSD": 1.27, "USDJPY": 149.0, "XAUUSD": 2350.0}
 
 class SyntheticFeed:
     """Acts like a broker's data side. Each bars() call reveals one more bar, so the demo
-    moves one 15-minute bar every few seconds."""
+    moves one 15-minute bar every few seconds, time-stamped with the real clock."""
 
     def __init__(self, symbols, history=300, seed=11):
         self.series, self.pos = {}, {}
@@ -29,7 +29,10 @@ class SyntheticFeed:
 
     def bars(self, symbol, timeframe, count):
         i = self.pos[symbol] = min(self.pos[symbol] + 1, len(self.series[symbol]))
-        return self.series[symbol][max(0, i - count):i]
+        chunk = self.series[symbol][max(0, i - count):i]
+        # re-stamp to the wall clock so ages and the journal read like a live session
+        now, n = datetime.now(timezone.utc), len(chunk)
+        return [Bar(now - timedelta(seconds=n - 1 - k), b.open, b.high, b.low, b.close) for k, b in enumerate(chunk)]
 
     def quote(self, symbol):
         c = self.series[symbol][self.pos[symbol] - 1].close

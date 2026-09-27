@@ -157,6 +157,16 @@ class Engine:
             "symbols": self.symbols, "timeframe": self.timeframe, "account": acc,
             "day_pnl": round(acc["equity"] - start, 2) if start else 0.0,
             "last_action": self.last_action,
+            "risk": {"risk_per_trade_pct": self.risk.risk_pct, "max_open": self.risk.max_open,
+                     "max_per_symbol": self.risk.max_per_symbol, "max_daily_loss_pct": self.risk.max_daily_loss_pct,
+                     "max_spread_points": self.risk.max_spread_points, "sl_atr": self.risk.sl_atr,
+                     "tp_atr": self.risk.tp_atr},
+            "strategies": [{"name": s.name, "weight": self.ensemble.weights.get(s.name, 1.0)}
+                           for s in self.ensemble.strategies],
+            "signal_threshold": self.ensemble.threshold,
+            "news_enabled": self.news is not None,
+            "news_veto": self.veto,
+            "server_time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         }
 
     def run(self, poll_seconds=None, once=False, connect=True):

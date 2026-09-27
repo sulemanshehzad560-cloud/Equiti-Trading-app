@@ -2,34 +2,130 @@
   "id": "/",
   "name": "Equiti Trader",
   "short_name": "Equiti Trader",
-  "description": "Monitor and control your automated Equiti MT5 trading bot: account, open positions, news filter and every trade decision.",
+  "description": "Terminal-grade control desk for your automated Equiti MT5 trading bot: account, risk, positions with R-multiples, news filter and every decision the bot makes.",
   "lang": "en",
   "dir": "ltr",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
   "orientation": "any",
-  "background_color": "#0b1220",
-  "theme_color": "#0b1220",
-  "categories": ["finance", "business", "productivity"],
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
+  "categories": [
+    "finance",
+    "business",
+    "productivity"
+  ],
   "prefer_related_applications": false,
-  "launch_handler": { "client_mode": "focus-existing" },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ],
   "screenshots": [
-    { "src": "screenshots/narrow-dashboard.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Account, bot status and controls" },
-    { "src": "screenshots/narrow-news.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "News filter: calendar blackouts and headline bias" },
-    { "src": "screenshots/wide-dashboard.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide", "label": "Dashboard on desktop" }
+    {
+      "src": "screenshots/narrow-desk.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Desk: account, engine, risk and decision pipeline"
+    },
+    {
+      "src": "screenshots/narrow-book.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Book: positions tracked from stop to target"
+    },
+    {
+      "src": "screenshots/narrow-wire.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Wire: news bias, blackouts and calendar"
+    },
+    {
+      "src": "screenshots/wide-desk.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desk on desktop"
+    },
+    {
+      "src": "screenshots/wide-log.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Decision log"
+    }
   ],
   "shortcuts": [
-    { "name": "Positions", "short_name": "Positions", "url": "/?tab=positions", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "News", "short_name": "News", "url": "/?tab=news", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Activity", "short_name": "Activity", "url": "/?tab=activity", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+    {
+      "name": "Book (open positions)",
+      "short_name": "Book",
+      "url": "/?tab=book",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Wire (news filter)",
+      "short_name": "Wire",
+      "url": "/?tab=wire",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Log (decisions)",
+      "short_name": "Log",
+      "url": "/?tab=log",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }

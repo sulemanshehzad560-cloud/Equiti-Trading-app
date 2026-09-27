@@ -47,6 +47,7 @@ class Position:
     opened: datetime | None = None
     comment: str = ""
     profit: float = 0.0
+    price: float = 0.0            # current market price
 
 
 @dataclass

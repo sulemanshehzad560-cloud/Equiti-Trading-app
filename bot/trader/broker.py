@@ -107,7 +107,8 @@ class MT5Broker(Broker):
                 continue   # never touch trades you placed by hand
             out.append(Position(p.ticket, p.symbol, BUY if p.type == self.mt5.POSITION_TYPE_BUY else SELL,
                                 p.volume, p.price_open, p.sl, p.tp,
-                                datetime.fromtimestamp(p.time, timezone.utc), p.comment, getattr(p, "profit", 0.0)))
+                                datetime.fromtimestamp(p.time, timezone.utc), p.comment, getattr(p, "profit", 0.0),
+                                getattr(p, "price_current", 0.0)))
         return out
 
     def _filling(self, symbol):
@@ -214,7 +215,8 @@ class PaperBroker(Broker):
         out = [p for p in self.open_positions if symbol is None or p.symbol == symbol]
         for p in out:
             if p.symbol in self.last:
-                p.profit = round(self._pnl(p, self.last[p.symbol].close), 2)
+                p.price = self.last[p.symbol].close
+                p.profit = round(self._pnl(p, p.price), 2)
         return out
 
     def open(self, req):

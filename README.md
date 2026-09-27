@@ -92,10 +92,18 @@ right away.
 
 ## 2. Put the app online (Netlify)
 
-1. On Netlify, choose **Add new site → Import from Git → GitHub →** this repo.
-2. Leave the build command empty and set the publish directory to `public`. `netlify.toml`
-   already sets both, so just click **Deploy**.
-3. Open `https://YOUR-SITE.netlify.app`. You should see the app with *Try with sample data*.
+1. On Netlify, choose **Add new site → Import an existing project → GitHub**, then pick the repo.
+2. Fill in the settings:
+   * **Branch to deploy:** the branch this folder is on.
+   * **Base directory:** `equiti-trader` if this folder lives inside another repo (as it does
+     for now in `Xtreme-COC-`), or leave it empty in a standalone repo.
+   * **Build command:** leave empty.
+   * **Publish directory:** `public`. Netlify fills this in from `netlify.toml`, and in the UI it
+     shows as `equiti-trader/public`.
+3. Click **Deploy**, then open `https://YOUR-SITE.netlify.app`. You should see the BOOT screen.
+   Hit *Run on sample data* to check everything works.
+4. Optionally rename the site under *Site configuration → Change site name*, for example
+   `equiti-trader`, so the URL is tidy before you package it.
 
 Any static HTTPS host works, including GitHub Pages and Cloudflare Pages. Just publish the `public/` folder.
 
@@ -137,21 +145,38 @@ paste that address and the access token, click **Test**, then **Save**.
   Treat the token like a password. To change it, delete `DASHBOARD_TOKEN` from `.env` and
   restart the bot, which prints a new one.
 
-## The app
+## The app: `equiti/trader`
 
-| Tab | Shows |
-|---|---|
-| Dashboard | Equity, balance, today's P&L, mode (Paper / Demo / **LIVE**), running, paused or halted, **Pause** and **Close all** |
-| Positions | Every open bot trade with live P&L, entry, stop and target |
-| News | Per-symbol blackout and headline bias meter, upcoming high and medium impact events, currency mood, latest headlines |
-| Activity | Every decision: opens with lot size and news multiplier, closes, and optionally skips with the reason |
+It's a terminal-style desk, dark by default with a light theme that follows the device, and
+monospace wherever numbers live.
+
+* **Header.** Connection LED with round-trip latency (`LINK 38ms`), MT5 server, a live UTC
+  clock, and a ticker tape with each symbol's news bias, blackouts, open P/L and a countdown
+  to the next big event.
+* **01 Desk.**
+  * *Account:* equity with a session sparkline, balance, floating P/L, day P&L, free margin.
+  * *Engine:* RUNNING, PAUSED or HALTED, mode tag (a pulsing **● LIVE** for real money),
+    uptime, strategy weights, **Pause entries** and **Flatten all**.
+  * *Risk:* slots used and daily loss budget as gauges, plus risk per trade, SL/TP in ATR and R:R.
+  * *Pipeline:* the last 100 decisions grouped by outcome (order sent, news veto, blackout,
+    spread, slots full…), which answers *"why didn't it trade?"*.
+  * *Symbols:* a table of bias, state and last decision.
+* **02 Book.** Each position with P/L, current price, **R-multiple**, age, and a stop → entry →
+  target track showing where price sits right now.
+* **03 Wire.** Bias meter per symbol with the veto lines drawn in, the economic calendar with
+  live `T−hh:mm:ss` countdowns, an FX mood heat grid, and headlines tagged with the
+  currencies the parser scored.
+* **04 Log.** `tail -f` of the journal: every OPEN, EXIT, SKIP, REJ and SYS line with its
+  reason and news context, filterable.
+* **Keys.** `1`–`4` tabs, `p` pause or resume, `r` refresh, `,` settings, `?` help. Flatten has no
+  hotkey on purpose. On a LIVE account you have to type `FLATTEN` to confirm.
 
 The app works offline for its shell, since the service worker caches it. Trading data always
 comes live from the bot and is never cached. Light and dark themes follow the device.
 
 To regenerate the icons and store screenshots after changing the design, use any headless
 browser: render `public/icons/icon.svg` at 192 and 512 px, then take the screenshots at
-1080×1920 and 1920×1080 with *Try with sample data* turned on.
+1080×1920 and 1920×1080 with *Run on sample data* turned on.
 
 ## Tests
 
