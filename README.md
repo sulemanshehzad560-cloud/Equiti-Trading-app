@@ -114,14 +114,13 @@ python main.py backtest --csv US500_M5.csv --symbol US500 --strategies orb,imom 
 
 ## 2. Put the app online (Netlify)
 
-1. On Netlify, choose **Add new site → Import an existing project → GitHub**, then pick the repo.
+1. On Netlify, choose **Add new site → Import an existing project → GitHub**, then pick
+   **Equiti-Trading-app**.
 2. Fill in the settings:
-   * **Branch to deploy:** the branch this folder is on.
-   * **Base directory:** `equiti-trader` if this folder lives inside another repo (as it does
-     for now in `Xtreme-COC-`), or leave it empty in a standalone repo.
+   * **Branch to deploy:** `main`.
+   * **Base directory:** leave empty.
    * **Build command:** leave empty.
-   * **Publish directory:** `public`. Netlify fills this in from `netlify.toml`, and in the UI it
-     shows as `equiti-trader/public`.
+   * **Publish directory:** `public`. Netlify fills this in from `netlify.toml`.
 3. Click **Deploy**, then open `https://YOUR-SITE.netlify.app`. You should see the BOOT screen.
    Hit *Run on sample data* to check everything works.
 4. Optionally rename the site under *Site configuration → Change site name*, for example
