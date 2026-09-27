@@ -5,7 +5,8 @@ from .backtest import synthetic_bars
 from .broker import default_symbol_info
 from .models import Bar
 
-STARTS = {"EURUSD": 1.08, "GBPUSD": 1.27, "USDJPY": 149.0, "XAUUSD": 2350.0}
+STARTS = {"EURUSD": 1.08, "GBPUSD": 1.27, "USDJPY": 149.0, "XAUUSD": 2350.0, "US500": 5600.0, "US100": 19800.0,
+          "AAPL": 220.0, "MSFT": 410.0, "NVDA": 118.0, "AMZN": 185.0, "GOOGL": 165.0, "META": 520.0}
 
 
 class SyntheticFeed:
@@ -15,7 +16,7 @@ class SyntheticFeed:
     def __init__(self, symbols, history=300, seed=11):
         self.series, self.pos = {}, {}
         for i, s in enumerate(symbols):
-            base = STARTS.get(s.upper()[:6], 1.0)
+            base = STARTS.get(s.upper()[:6], STARTS.get(s.upper(), 100.0))
             raw = synthetic_bars(4000, 1.0, seed + i)
             self.series[s] = [Bar(b.time, b.open * base, b.high * base, b.low * base, b.close * base) for b in raw]
             self.pos[s] = history
@@ -27,7 +28,7 @@ class SyntheticFeed:
     def symbol_info(self, symbol):
         return default_symbol_info(symbol)
 
-    def bars(self, symbol, timeframe, count):
+    def bars(self, symbol, timeframe, count, include_forming=False):
         i = self.pos[symbol] = min(self.pos[symbol] + 1, len(self.series[symbol]))
         chunk = self.series[symbol][max(0, i - count):i]
         # re-stamp to the wall clock so ages and the journal read like a live session

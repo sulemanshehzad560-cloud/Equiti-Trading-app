@@ -83,7 +83,8 @@ def cmd_demo(args, cfg):
     symbols = cfg["symbols"]
     broker = PaperBroker(cfg.get("paper_balance", 10000), data_source=SyntheticFeed(symbols))
     news = seed_news(NewsEngine(cfg.get("news", {})))
-    engine = Engine({**cfg, "mode": "demo-sim", "trading_hours_utc": [0, 24]}, broker, news,
+    engine = Engine({**cfg, "mode": "demo-sim", "trading_hours_utc": [0, 24], "timeframe": "M15", "ignore_sessions": True},
+                    broker, news,
                     journal_path="logs/demo-journal.jsonl")
     start_app(engine, cfg, args)
     engine.run(poll_seconds=args.speed, once=False)
@@ -95,8 +96,34 @@ def cmd_backtest(args, cfg):
     else:
         bars = synthetic_bars(args.bars)
     print(f"{len(bars)} bars, {bars[0].time:%Y-%m-%d} -> {bars[-1].time:%Y-%m-%d}")
-    res = run_backtest(cfg, args.symbol, bars, args.balance, args.spread)
+    if args.strategies:
+        names = [x.strip() for x in args.strategies.split(",") if x.strip()]
+        cfg = {**cfg, "strategy_mode": "independent",
+               "strategies": {n: cfg.get("strategies", {}).get(n, {}) for n in names}}
+    if args.tz and bars:          # MT5 exports use broker server time; convert to UTC for session logic
+        from datetime import timedelta
+        from zoneinfo import ZoneInfo
+        from trader.models import Bar
+        z = ZoneInfo(args.tz)
+        bars = [Bar(b.time.replace(tzinfo=z).astimezone(__import__("datetime").timezone.utc), b.open, b.high, b.low,
+                    b.close, b.volume) for b in bars]
+    costs = {"spread_pct": args.spread_pct} if args.spread_pct is not None else {}
+    if args.financing:
+        costs["financing_pct_annual"] = args.financing
+    res = run_backtest(cfg, args.symbol, bars, args.balance, args.spread, **costs)
     print(json.dumps(res, indent=2))
+
+
+def cmd_research(args, cfg):
+    from trader import research
+    if args.fetch:
+        research.fetch(args.data)
+    costs = dict(research.COSTS)
+    if args.no_costs:
+        costs = research.NO_COSTS
+    res = research.run(args.data, args.out, costs)
+    print(f"costs: {costs}\n")
+    print(research.table(res))
 
 
 def cmd_news(args, cfg):
@@ -133,6 +160,15 @@ def main():
     b.add_argument("--bars", type=int, default=3000)
     b.add_argument("--balance", type=float, default=10000)
     b.add_argument("--spread", type=float, default=10, help="spread in points")
+    b.add_argument("--spread-pct", type=float, help="spread as %% of price (use for shares, e.g. 0.05)")
+    b.add_argument("--financing", type=float, default=0, help="overnight financing, %% per year (e.g. 3)")
+    b.add_argument("--strategies", help="comma list to test on their own, e.g. orb or rsi2,tsmom")
+    b.add_argument("--tz", help="timezone of the CSV timestamps, e.g. Etc/GMT-3 for an MT5 export at UTC+3")
+    rs = sub.add_parser("research", help="test the researched strategies on real stock data")
+    rs.add_argument("--fetch", action="store_true", help="download the sample data first")
+    rs.add_argument("--data", default="data")
+    rs.add_argument("--out", default="research_results.json")
+    rs.add_argument("--no-costs", action="store_true")
     n = sub.add_parser("news")
     n.add_argument("--symbol", action="append")
     args = p.parse_args()
@@ -140,9 +176,11 @@ def main():
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO if args.cmd in ("run", "demo") else logging.WARNING,
                         format="%(asctime)s %(levelname)-7s %(name)s: %(message)s")
     load_env()
-    cfg_path = args.config if os.path.exists(args.config) else "config.example.json"
+    cfg_path = args.config if os.path.exists(args.config) else (
+        "config.stocks.example.json" if "stocks" in args.config else "config.example.json")
     cfg = load_config(cfg_path)
-    {"run": cmd_run, "demo": cmd_demo, "backtest": cmd_backtest, "news": cmd_news}[args.cmd](args, cfg)
+    {"run": cmd_run, "demo": cmd_demo, "backtest": cmd_backtest, "news": cmd_news,
+     "research": cmd_research}[args.cmd](args, cfg)
 
 
 if __name__ == "__main__":

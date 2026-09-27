@@ -1,5 +1,6 @@
 """Exercises MT5Broker against a fake MetaTrader5 module (the real one is Windows-only)."""
 import sys
+import time
 import types
 import unittest
 from types import SimpleNamespace as NS
@@ -26,7 +27,7 @@ def fake_mt5():
     m.symbol_info = lambda s: NS(point=1e-5, digits=5, trade_tick_size=1e-5, trade_tick_value=1.0,
                                  trade_contract_size=100000, volume_min=0.01, volume_max=100, volume_step=0.01,
                                  trade_stops_level=0, filling_mode=2)
-    m.symbol_info_tick = lambda s: NS(bid=1.1000, ask=1.1001)
+    m.symbol_info_tick = lambda s: NS(bid=1.1000, ask=1.1001, time=int(time.time()) + 3 * 3600)  # server = UTC+3
     m.positions_get = lambda **kw: [NS(ticket=7, symbol="EURUSD", type=0, volume=0.1, price_open=1.1, sl=1.09,
                                        tp=1.12, time=1_700_000_000, comment="", magic=260927),
                                     NS(ticket=8, symbol="EURUSD", type=1, volume=1, price_open=1.1, sl=0, tp=0,
@@ -53,6 +54,8 @@ class MT5AdapterTests(unittest.TestCase):
     def test_bars_and_info(self):
         bars = self.b.bars("EURUSD", "M15", 3)
         self.assertEqual(len(bars), 3)
+        self.assertEqual(self.b.server_offset, 3 * 3600)
+        self.assertEqual(int(bars[0].time.timestamp()), 1_700_000_000 - 3 * 3600)   # converted to real UTC
         self.assertEqual(self.b.symbol_info("EURUSD").digits, 5)
         self.assertTrue(self.b.is_demo())
 

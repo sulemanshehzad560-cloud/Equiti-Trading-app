@@ -29,6 +29,7 @@ from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from html import unescape
 
+from .markets import classify
 from .models import NewsAssessment
 
 log = logging.getLogger("news")
@@ -59,6 +60,9 @@ BULLISH = {
     "hotter than expected": 0.6, "surge": 0.6, "surges": 0.6, "soars": 0.7, "rally": 0.5, "rallies": 0.5,
     "jumps": 0.5, "climbs": 0.4, "gains": 0.4, "rises": 0.3, "rebounds": 0.4, "firmer": 0.4, "strong": 0.3,
     "strengthens": 0.5, "upbeat": 0.5, "robust": 0.5, "record high": 0.6, "multi-year high": 0.6, "bullish": 0.6,
+    # company / stock language
+    "beats estimates": 0.8, "tops estimates": 0.8, "raises guidance": 1.0, "raises outlook": 0.9, "upgrade": 0.6,
+    "upgraded": 0.6, "buyback": 0.5, "record revenue": 0.7, "outperform": 0.5, "all-time high": 0.6,
 }
 BEARISH = {
     "dovish": 1.0, "rate cut": 1.0, "rate cuts": 1.0, "cuts rates": 1.0, "lowers rates": 1.0, "cut": 0.5,
@@ -67,6 +71,8 @@ BEARISH = {
     "drops": 0.4, "slides": 0.4, "declines": 0.4, "dips": 0.3, "eases": 0.3, "weak": 0.3, "weakens": 0.5,
     "recession": 0.8, "contraction": 0.6, "downgrade": 0.6, "sell-off": 0.6, "selloff": 0.6, "bearish": 0.6,
     "multi-year low": 0.6, "record low": 0.6,
+    "misses estimates": 0.8, "cuts guidance": 1.0, "lowers guidance": 1.0, "downgraded": 0.6, "lawsuit": 0.4,
+    "probe": 0.5, "investigation": 0.5, "recall": 0.5, "fraud": 0.9, "underperform": 0.5, "warns": 0.6,
 }
 NEGATIONS = re.compile(r"\b(not|no|fails to|failed to|unlikely to|despite)\b")
 CLAUSE_SPLIT = re.compile(r"\s+(?:as|while|but|after|amid|whereas|and|;)\s+|[;,:–—|]\s*", re.I)
@@ -86,15 +92,19 @@ _BEAR_RX = [(rx, w) for rx, w in zip(_compile(BEARISH), BEARISH.values())]
 
 
 def symbol_currencies(symbol):
-    """'EURUSD.m' -> ('EUR', 'USD'); 'XAUUSD' -> ('XAU', 'USD'); 'US30' -> ('USIDX', None)."""
-    s = re.sub(r"[^A-Z0-9]", "", symbol.upper())
-    for key, cur in INDEX_SYMBOLS.items():
-        if s.startswith(key):
-            return cur, None
-    letters = re.sub(r"[^A-Z]", "", s)
-    if len(letters) >= 6:
-        return letters[:3], letters[3:6]
-    return letters or s, None
+    """'EURUSD.m' -> ('EUR', 'USD'); 'XAUUSD' -> ('XAU', 'USD'); 'US30' -> ('USIDX', None);
+    share CFDs -> ('AAPL', None) so headlines about the company drive the bias."""
+    _, base, quote = classify(symbol)
+    return base, quote
+
+
+def register_aliases(aliases):
+    """Teach the headline parser company names: {"AAPL": ["apple", "iphone"], ...}.
+    The ticker itself is always matched in capitals (e.g. 'AAPL', '$AAPL')."""
+    for tick, names in (aliases or {}).items():
+        tick = tick.upper()
+        _CUR_RX[tick] = _compile([n.lower() for n in names])
+        _CASED_RX[tick] = [re.compile(r"(?<![A-Za-z])\$?" + re.escape(tick) + r"(?![A-Za-z])")]
 
 
 def _first_subject(clause):
@@ -195,6 +205,7 @@ def parse_calendar(raw):
 class NewsEngine:
     def __init__(self, cfg, fetch=_http_get):
         self.cfg = cfg
+        register_aliases(cfg.get("stock_aliases"))
         self.fetch = fetch
         self.events, self.headlines = [], []
         self._cal_at, self._feeds_at = 0.0, 0.0
@@ -253,8 +264,8 @@ class NewsEngine:
         impacts = set(self.cfg.get("blackout_impacts", ["High"]))
         extra = {c.upper() for c in self.cfg.get("always_watch", ["USD"])}
         watch = {c for c in currencies if c} | extra
-        if "XAU" in watch or "XAG" in watch or "OIL" in watch or "USIDX" in watch:
-            watch.add("USD")
+        if any(c and c not in CURRENCY_TERMS or c in ("XAU", "XAG", "OIL", "USIDX") for c in currencies):
+            watch.add("USD")      # metals, oil, indices and US shares all move on US data
         return [e for e in self.events
                 if e["impact"] in impacts and e["currency"] in watch and e["time"] - before <= now <= e["time"] + after]
 

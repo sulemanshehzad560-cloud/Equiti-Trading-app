@@ -36,6 +36,7 @@
     <button data-tab="book"><b>02</b> Book <span id="bookCount" class="count"></span></button>
     <button data-tab="wire"><b>03</b> Wire</button>
     <button data-tab="log"><b>04</b> Log</button>
+    <button data-tab="lab"><b>05</b> Lab</button>
   </nav>
 
   <main id="main">
@@ -166,11 +167,31 @@
       </article>
     </section>
 
+    <!-- 05 LAB -->
+    <section id="tab-lab" class="tab" hidden>
+      <article class="panel">
+        <div class="panel-title">[ PLAYBOOK ] <span id="labMode" class="dim"></span></div>
+        <p class="dim small lab-note">Each strategy is implemented to its published rules, then re-tested on real data with CFD costs
+          (0.05% spread, 3%/yr financing). The evidence below is from that re-test, not from marketing claims.
+          Past results don't promise future ones.</p>
+        <div id="playbook" class="playbook"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-title">[ EVIDENCE ] <span class="dim">python main.py research</span></div>
+        <div class="table-wrap"><table class="tbl ev-tbl"><thead><tr><th>UNIVERSE</th><th>TEST</th><th class="r">CAGR</th><th class="r">SHARPE</th><th class="r">MAX DD</th><th class="r opt">TRADES</th><th class="r opt">WIN</th><th class="r opt">IN MKT</th></tr></thead><tbody id="evidence"></tbody></table></div>
+        <p class="dim small">Sizing shown: fixed capital per position ("alloc"), the same basis as the published tests. <span id="evGen"></span></p>
+      </article>
+      <article class="panel">
+        <div class="panel-title">[ BENCH ] <span class="dim">researched, available, currently off</span></div>
+        <div id="bench" class="bench"></div>
+      </article>
+    </section>
+
     <p id="error" class="error" role="alert" hidden></p>
   </main>
 
   <footer class="foot">
-    <span><kbd>1</kbd>-<kbd>4</kbd> tabs · <kbd>p</kbd> pause · <kbd>r</kbd> refresh · <kbd>,</kbd> settings · <kbd>?</kbd> help</span>
+    <span><kbd>1</kbd>-<kbd>5</kbd> tabs · <kbd>p</kbd> pause · <kbd>r</kbd> refresh · <kbd>,</kbd> settings · <kbd>?</kbd> help</span>
     <span id="lastSync" class="dim">never synced</span>
   </footer>
 
@@ -213,7 +234,7 @@
     <form method="dialog">
       <div class="panel-title">[ KEYS ]</div>
       <table class="tbl keys">
-        <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></td><td>Desk · Book · Wire · Log</td></tr>
+        <tr><td><kbd>1</kbd> … <kbd>5</kbd></td><td>Desk · Book · Wire · Log · Lab</td></tr>
         <tr><td><kbd>p</kbd></td><td>Pause or resume new entries</td></tr>
         <tr><td><kbd>r</kbd></td><td>Refresh now</td></tr>
         <tr><td><kbd>,</kbd></td><td>Settings</td></tr>

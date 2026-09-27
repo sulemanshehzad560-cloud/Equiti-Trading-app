@@ -1,0 +1,633 @@
+{
+  "generated": "2026-09-27T11:34:15+00:00",
+  "costs": {
+    "spread_pct": 0.05,
+    "commission_pct": 0.0,
+    "financing_pct_annual": 3.0
+  },
+  "risk": {
+    "risk_per_trade_pct": 1.0,
+    "max_open_positions": 6,
+    "max_positions_per_symbol": 2,
+    "max_daily_loss_pct": 100,
+    "max_spread_points": 1000000000,
+    "max_notional_pct": 50,
+    "max_lots_per_trade": 1000000000,
+    "sl_atr_mult": 3.0,
+    "tp_atr_mult": 0
+  },
+  "rows": [
+    {
+      "universe": "S&P500 monthly 1872-",
+      "test": "buy & hold (equal weight)",
+      "sizing": "-",
+      "cagr_pct": 4.86,
+      "sharpe": 0.41,
+      "sortino": 0.6,
+      "total_return_pct": 152902.4,
+      "max_drawdown_pct": 84.76,
+      "trades": null,
+      "exposure_pct": 100.0
+    },
+    {
+      "universe": "S&P500 monthly 1872-",
+      "test": "tsmom 12m (long only)",
+      "sizing": "risk 1%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 0.32,
+      "sharpe": 0.31,
+      "sortino": 0.41,
+      "max_drawdown_pct": 9.2,
+      "total_return_pct": 64.1,
+      "trades": 61,
+      "win_rate_pct": 55.7,
+      "profit_factor": 5.76,
+      "exposure_pct": 58.8,
+      "costs_paid": 3306.78,
+      "period": "1872-03-01 to 2026-08-01"
+    },
+    {
+      "universe": "S&P500 monthly 1872-",
+      "test": "tsmom 12m (long only)",
+      "sizing": "alloc 100%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 3.24,
+      "sharpe": 0.44,
+      "sortino": 0.63,
+      "max_drawdown_pct": 37.6,
+      "total_return_pct": 13594.2,
+      "trades": 65,
+      "win_rate_pct": 56.9,
+      "profit_factor": 15.76,
+      "exposure_pct": 64.4,
+      "costs_paid": 529664.14,
+      "period": "1872-03-01 to 2026-08-01"
+    },
+    {
+      "universe": "S&P500 monthly 1872-",
+      "test": "tsmom 12m (long/short)",
+      "sizing": "risk 1%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 0.3,
+      "sharpe": 0.25,
+      "sortino": 0.34,
+      "max_drawdown_pct": 9.77,
+      "total_return_pct": 58.0,
+      "trades": 119,
+      "win_rate_pct": 43.7,
+      "profit_factor": 2.63,
+      "exposure_pct": 90.8,
+      "costs_paid": 4473.43,
+      "period": "1872-03-01 to 2026-08-01"
+    },
+    {
+      "universe": "S&P500 monthly 1872-",
+      "test": "tsmom 12m (long/short)",
+      "sizing": "alloc 100%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 2.81,
+      "sharpe": 0.33,
+      "sortino": 0.48,
+      "max_drawdown_pct": 49.35,
+      "total_return_pct": 7108.4,
+      "trades": 128,
+      "win_rate_pct": 43.8,
+      "profit_factor": 3.26,
+      "exposure_pct": 100.0,
+      "costs_paid": 431396.09,
+      "period": "1872-03-01 to 2026-08-01"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "buy & hold (equal weight)",
+      "sizing": "-",
+      "cagr_pct": 17.11,
+      "sharpe": 1.07,
+      "sortino": 1.56,
+      "total_return_pct": 305.4,
+      "max_drawdown_pct": 18.61,
+      "trades": null,
+      "exposure_pct": 100.0
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "rsi2",
+      "sizing": "risk 1%",
+      "strategies": [
+        "rsi2"
+      ],
+      "cagr_pct": 0.82,
+      "sharpe": 0.79,
+      "sortino": 1.29,
+      "max_drawdown_pct": 1.7,
+      "total_return_pct": 7.5,
+      "trades": 73,
+      "win_rate_pct": 75.3,
+      "profit_factor": 2.68,
+      "exposure_pct": 10.7,
+      "costs_paid": 65.45,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "rsi2",
+      "sizing": "alloc 100%",
+      "strategies": [
+        "rsi2"
+      ],
+      "cagr_pct": 3.68,
+      "sharpe": 0.8,
+      "sortino": 1.34,
+      "max_drawdown_pct": 7.42,
+      "total_return_pct": 37.8,
+      "trades": 73,
+      "win_rate_pct": 75.3,
+      "profit_factor": 2.72,
+      "exposure_pct": 10.7,
+      "costs_paid": 304.67,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "tom",
+      "sizing": "risk 1%",
+      "strategies": [
+        "tom"
+      ],
+      "cagr_pct": 0.35,
+      "sharpe": 0.25,
+      "sortino": 0.37,
+      "max_drawdown_pct": 4.29,
+      "total_return_pct": 3.1,
+      "trades": 102,
+      "win_rate_pct": 55.9,
+      "profit_factor": 1.19,
+      "exposure_pct": 17.8,
+      "costs_paid": 136.43,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "tom",
+      "sizing": "alloc 100%",
+      "strategies": [
+        "tom"
+      ],
+      "cagr_pct": 1.65,
+      "sharpe": 0.31,
+      "sortino": 0.45,
+      "max_drawdown_pct": 11.8,
+      "total_return_pct": 15.6,
+      "trades": 102,
+      "win_rate_pct": 55.9,
+      "profit_factor": 1.23,
+      "exposure_pct": 17.8,
+      "costs_paid": 470.55,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "tsmom (long only)",
+      "sizing": "risk 1%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 0.74,
+      "sharpe": 0.41,
+      "sortino": 0.55,
+      "max_drawdown_pct": 4.45,
+      "total_return_pct": 6.8,
+      "trades": 7,
+      "win_rate_pct": 42.9,
+      "profit_factor": 4.84,
+      "exposure_pct": 82.1,
+      "costs_paid": 340.94,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "tsmom (long only)",
+      "sizing": "alloc 100%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 3.75,
+      "sharpe": 0.41,
+      "sortino": 0.56,
+      "max_drawdown_pct": 24.79,
+      "total_return_pct": 38.6,
+      "trades": 7,
+      "win_rate_pct": 42.9,
+      "profit_factor": 4.33,
+      "exposure_pct": 82.1,
+      "costs_paid": 2024.34,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "tsmom (long/short)",
+      "sizing": "risk 1%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 0.31,
+      "sharpe": 0.17,
+      "sortino": 0.22,
+      "max_drawdown_pct": 4.59,
+      "total_return_pct": 2.8,
+      "trades": 13,
+      "win_rate_pct": 23.1,
+      "profit_factor": 1.5,
+      "exposure_pct": 91.4,
+      "costs_paid": 363.04,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "tsmom (long/short)",
+      "sizing": "alloc 100%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": -0.92,
+      "sharpe": -0.01,
+      "sortino": -0.02,
+      "max_drawdown_pct": 40.11,
+      "total_return_pct": -7.9,
+      "trades": 13,
+      "win_rate_pct": 23.1,
+      "profit_factor": 0.82,
+      "exposure_pct": 91.4,
+      "costs_paid": 1622.22,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "trend (EMA/ADX)",
+      "sizing": "risk 1%",
+      "strategies": [
+        "trend"
+      ],
+      "cagr_pct": -0.09,
+      "sharpe": -0.02,
+      "sortino": -0.03,
+      "max_drawdown_pct": 7.83,
+      "total_return_pct": -0.8,
+      "trades": 27,
+      "win_rate_pct": 25.9,
+      "profit_factor": 0.95,
+      "exposure_pct": 87.6,
+      "costs_paid": 472.85,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "trend (EMA/ADX)",
+      "sizing": "alloc 100%",
+      "strategies": [
+        "trend"
+      ],
+      "cagr_pct": -2.52,
+      "sharpe": -0.18,
+      "sortino": -0.24,
+      "max_drawdown_pct": 39.92,
+      "total_return_pct": -20.2,
+      "trades": 27,
+      "win_rate_pct": 25.9,
+      "profit_factor": 0.67,
+      "exposure_pct": 87.6,
+      "costs_paid": 1504.45,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "playbook: rsi2+tom+tsmom",
+      "sizing": "risk 1%",
+      "strategies": [
+        "rsi2",
+        "tom",
+        "tsmom"
+      ],
+      "cagr_pct": 1.96,
+      "sharpe": 0.62,
+      "sortino": 0.89,
+      "max_drawdown_pct": 6.15,
+      "total_return_pct": 18.7,
+      "trades": 182,
+      "win_rate_pct": 63.2,
+      "profit_factor": 1.78,
+      "exposure_pct": 86.5,
+      "costs_paid": 584.08,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "SPY 2008-17",
+      "test": "playbook: rsi2+tom+tsmom",
+      "sizing": "alloc 33.3%",
+      "strategies": [
+        "rsi2",
+        "tom",
+        "tsmom"
+      ],
+      "cagr_pct": 3.09,
+      "sharpe": 0.6,
+      "sortino": 0.86,
+      "max_drawdown_pct": 12.41,
+      "total_return_pct": 31.0,
+      "trades": 182,
+      "win_rate_pct": 63.2,
+      "profit_factor": 1.93,
+      "exposure_pct": 86.5,
+      "costs_paid": 978.54,
+      "period": "2009-02-17 to 2017-12-29"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "buy & hold (equal weight)",
+      "sizing": "-",
+      "cagr_pct": 19.23,
+      "sharpe": 0.78,
+      "sortino": 1.12,
+      "total_return_pct": 408.4,
+      "max_drawdown_pct": 63.55,
+      "trades": null,
+      "exposure_pct": 100.0
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "rsi2",
+      "sizing": "risk 1%",
+      "strategies": [
+        "rsi2"
+      ],
+      "cagr_pct": 1.19,
+      "sharpe": 0.49,
+      "sortino": 0.74,
+      "max_drawdown_pct": 5.51,
+      "total_return_pct": 11.5,
+      "trades": 355,
+      "win_rate_pct": 64.8,
+      "profit_factor": 1.4,
+      "exposure_pct": 38.1,
+      "costs_paid": 151.73,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "rsi2",
+      "sizing": "alloc 25%",
+      "strategies": [
+        "rsi2"
+      ],
+      "cagr_pct": 1.58,
+      "sharpe": 0.25,
+      "sortino": 0.37,
+      "max_drawdown_pct": 19.51,
+      "total_return_pct": 15.6,
+      "trades": 355,
+      "win_rate_pct": 64.8,
+      "profit_factor": 1.19,
+      "exposure_pct": 38.1,
+      "costs_paid": 357.18,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "xsmom top-2",
+      "sizing": "risk 1%",
+      "strategies": [
+        "xsmom"
+      ],
+      "cagr_pct": 4.22,
+      "sharpe": 0.49,
+      "sortino": 0.69,
+      "max_drawdown_pct": 21.67,
+      "total_return_pct": 46.5,
+      "trades": 69,
+      "win_rate_pct": 50.7,
+      "profit_factor": 2.78,
+      "exposure_pct": 90.8,
+      "costs_paid": 1135.97,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "xsmom top-2",
+      "sizing": "alloc 25%",
+      "strategies": [
+        "xsmom"
+      ],
+      "cagr_pct": 8.29,
+      "sharpe": 0.47,
+      "sortino": 0.66,
+      "max_drawdown_pct": 50.5,
+      "total_return_pct": 108.7,
+      "trades": 69,
+      "win_rate_pct": 50.7,
+      "profit_factor": 2.22,
+      "exposure_pct": 90.8,
+      "costs_paid": 3237.04,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "tsmom (long only)",
+      "sizing": "risk 1%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 6.16,
+      "sharpe": 0.64,
+      "sortino": 0.89,
+      "max_drawdown_pct": 19.85,
+      "total_return_pct": 73.7,
+      "trades": 54,
+      "win_rate_pct": 40.7,
+      "profit_factor": 4.47,
+      "exposure_pct": 90.4,
+      "costs_paid": 1488.75,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "tsmom (long only)",
+      "sizing": "alloc 25%",
+      "strategies": [
+        "tsmom"
+      ],
+      "cagr_pct": 12.44,
+      "sharpe": 0.64,
+      "sortino": 0.9,
+      "max_drawdown_pct": 43.13,
+      "total_return_pct": 195.5,
+      "trades": 54,
+      "win_rate_pct": 40.7,
+      "profit_factor": 3.7,
+      "exposure_pct": 90.4,
+      "costs_paid": 4240.39,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "tom",
+      "sizing": "risk 1%",
+      "strategies": [
+        "tom"
+      ],
+      "cagr_pct": 2.66,
+      "sharpe": 0.57,
+      "sortino": 0.86,
+      "max_drawdown_pct": 8.06,
+      "total_return_pct": 27.4,
+      "trades": 530,
+      "win_rate_pct": 54.9,
+      "profit_factor": 1.35,
+      "exposure_pct": 18.0,
+      "costs_paid": 316.48,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "tom",
+      "sizing": "alloc 25%",
+      "strategies": [
+        "tom"
+      ],
+      "cagr_pct": 4.74,
+      "sharpe": 0.46,
+      "sortino": 0.7,
+      "max_drawdown_pct": 23.66,
+      "total_return_pct": 53.4,
+      "trades": 530,
+      "win_rate_pct": 54.9,
+      "profit_factor": 1.29,
+      "exposure_pct": 18.0,
+      "costs_paid": 644.1,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "playbook: rsi2+xsmom+tsmom",
+      "sizing": "risk 1%",
+      "strategies": [
+        "rsi2",
+        "xsmom",
+        "tsmom"
+      ],
+      "cagr_pct": 8.25,
+      "sharpe": 0.58,
+      "sortino": 0.82,
+      "max_drawdown_pct": 29.57,
+      "total_return_pct": 108.1,
+      "trades": 187,
+      "win_rate_pct": 52.9,
+      "profit_factor": 2.88,
+      "exposure_pct": 92.4,
+      "costs_paid": 2480.27,
+      "period": "2005-10-03 to 2014-12-31"
+    },
+    {
+      "universe": "5 stocks 2004-14",
+      "test": "playbook: rsi2+xsmom+tsmom",
+      "sizing": "alloc 8.3%",
+      "strategies": [
+        "rsi2",
+        "xsmom",
+        "tsmom"
+      ],
+      "cagr_pct": 5.87,
+      "sharpe": 0.48,
+      "sortino": 0.67,
+      "max_drawdown_pct": 34.11,
+      "total_return_pct": 69.4,
+      "trades": 187,
+      "win_rate_pct": 52.9,
+      "profit_factor": 2.37,
+      "exposure_pct": 92.4,
+      "costs_paid": 1860.82,
+      "period": "2005-10-03 to 2014-12-31"
+    }
+  ],
+  "strategies": {
+    "trend": {
+      "name": "trend",
+      "title": "EMA trend + ADX",
+      "style": "swing",
+      "markets": "FX, metals, indices",
+      "source": "Classic trend following (Wilder ADX, 1978)",
+      "summary": "EMA 20/50 alignment, confirmed by ADX strength and the DI lines."
+    },
+    "meanrev": {
+      "name": "meanrev",
+      "title": "RSI + Bollinger fade",
+      "style": "swing",
+      "markets": "FX in ranges",
+      "source": "Bollinger (2001); Wilder RSI",
+      "summary": "Fades RSI extremes outside the Bollinger Bands, only when ADX says the market is ranging."
+    },
+    "breakout": {
+      "name": "breakout",
+      "title": "Donchian breakout",
+      "style": "swing",
+      "markets": "FX, metals, indices",
+      "source": "Donchian channels; Turtle Traders (1983)",
+      "summary": "Close through the prior 20-bar high or low, with an ATR push filter."
+    },
+    "rsi2": {
+      "name": "rsi2",
+      "title": "Connors RSI(2) pullback",
+      "style": "swing",
+      "markets": "US indices, large-cap stocks (daily)",
+      "source": "Connors & Alvarez, 'Short Term Trading Strategies That Work' (2008)",
+      "summary": "Buy a sharp 1-3 day dip (RSI(2) < 10) while price is above its 200-day average. Exit when price closes back above the 5-day average. Mean reversion inside an uptrend."
+    },
+    "tsmom": {
+      "name": "tsmom",
+      "title": "Time-series momentum (vol-scaled)",
+      "style": "swing",
+      "markets": "Indices, stocks, metals, FX (daily)",
+      "source": "Moskowitz, Ooi & Pedersen, 'Time Series Momentum', JFE (2012)",
+      "summary": "Hold the direction of the past 12-month return, sized by volatility (the ATR-based sizing does the vol-scaling). Exit when the 12-month return flips sign."
+    },
+    "xsmom": {
+      "name": "xsmom",
+      "title": "Cross-sectional 12-1 momentum",
+      "style": "swing",
+      "markets": "A basket of stocks (daily)",
+      "source": "Jegadeesh & Titman, JF (1993); absolute-momentum filter from Antonacci, 'Dual Momentum' (2014)",
+      "summary": "Rank the basket by return from 12 months ago to 1 month ago. Own the top N when their momentum is also positive. Sell when a name drops out of the top 2N."
+    },
+    "tom": {
+      "name": "tom",
+      "title": "Turn-of-the-month",
+      "style": "calendar",
+      "markets": "US indices, broad stocks (daily)",
+      "source": "Lakonishok & Smidt, RFS (1988); McConnell & Xu, FAJ (2008)",
+      "summary": "Equity returns cluster from the last trading day of the month to the 3rd trading day of the next. Buy the close before that window and exit after day 3."
+    },
+    "orb": {
+      "name": "orb",
+      "title": "5-min opening range breakout",
+      "style": "intraday",
+      "markets": "US stocks in play, US index CFDs (M1/M5)",
+      "source": "Zarattini, Barbon & Aziz, 'A Profitable Day Trading Strategy for the U.S. Equity Market' (SSRN 4729284, 2024)",
+      "summary": "Trade in the direction of the first 5-minute candle once price breaks that candle's high or low. Stop at 10% of the 14-day ATR, flat by the close. Only on 'stocks in play' (opening volume well above normal)."
+    },
+    "imom": {
+      "name": "imom",
+      "title": "Market intraday momentum",
+      "style": "intraday",
+      "markets": "US index CFDs such as US500 and US100 (M5-M30)",
+      "source": "Gao, Han, Li & Zhou, 'Market Intraday Momentum', JFE (2018)",
+      "summary": "The return from yesterday's close to 10:00 NY predicts the last half-hour. Enter in that direction 30 minutes before the close and exit at the close."
+    }
+  }
+}

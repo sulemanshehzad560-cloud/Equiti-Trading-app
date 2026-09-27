@@ -85,6 +85,11 @@ class APITests(unittest.TestCase):
         code, body = self.call("/%2e%2e/secret.txt")
         self.assertNotIn(b"nope", body)
 
+    def test_research_endpoint(self):
+        code, body = self.call("/api/research")
+        self.assertEqual(code, 200)
+        self.assertIn("rows", json.loads(body))
+
     def test_news_disabled(self):
         self.assertFalse(json.loads(self.call("/api/news")[1])["enabled"])
 

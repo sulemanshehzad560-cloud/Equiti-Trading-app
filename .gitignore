@@ -15,3 +15,5 @@ node_modules/
 signing-key-info.txt
 *.aab
 *.apk
+# downloaded research data (python main.py research --fetch)
+bot/data/

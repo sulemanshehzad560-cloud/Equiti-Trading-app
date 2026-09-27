@@ -1,0 +1,69 @@
+{
+  "symbols": ["US500", "US100", "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META"],
+  "timeframe": "D1",
+  "history_bars": 320,
+  "poll_seconds": 30,
+  "magic": 260927,
+  "paper_balance": 10000,
+  "journal": "logs/journal.jsonl",
+  "daily_eval_minutes_before_close": 10,
+  "sessions": {},
+
+  "app": { "enabled": true, "host": "127.0.0.1", "port": 8787, "allow_origin": "*" },
+
+  "strategy_mode": "independent",
+  "exit_on_opposite_signal": true,
+  "strategies": {
+    "rsi2":  { "enabled": true, "entry": 10, "trend_sma": 200, "exit_sma": 5, "sl_atr": 4.0 },
+    "tsmom": { "enabled": true, "lookback": 252, "allow_short": false, "sl_atr": 4.0 },
+    "xsmom": { "enabled": true, "top_n": 2, "lookback": 252, "skip": 21 },
+    "tom":   { "enabled": false, "hold_days": 3 },
+    "orb":   { "enabled": false, "or_minutes": 5, "stop_atr_frac": 0.1, "rel_vol_min": 1.0 },
+    "imom":  { "enabled": false }
+  },
+
+  "risk": {
+    "sizing": "allocation",
+    "allocation_pct": 10,
+    "risk_per_trade_pct": 0.5,
+    "max_notional_pct": 25,
+    "max_lots_per_trade": 100000,
+    "max_open_positions": 8,
+    "max_positions_per_symbol": 3,
+    "max_daily_loss_pct": 3.0,
+    "max_spread_points": 1000000,
+    "max_spread_pct": 0.15,
+    "sl_atr_mult": 3.0,
+    "tp_atr_mult": 0,
+    "trail_atr_mult": 0
+  },
+
+  "news": {
+    "enabled": true,
+    "calendar_url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+    "calendar_refresh_min": 60,
+    "blackout_impacts": ["High"],
+    "blackout_before_min": 30,
+    "blackout_after_min": 30,
+    "always_watch": ["USD"],
+    "close_positions_before_event": false,
+    "feeds": [
+      "https://www.fxstreet.com/rss/news",
+      "https://feeds.content.dowjones.io/public/rss/mw_marketpulse",
+      "https://www.investing.com/rss/news_25.rss"
+    ],
+    "stock_aliases": {
+      "AAPL": ["apple", "iphone", "tim cook"],
+      "MSFT": ["microsoft", "azure", "satya nadella"],
+      "NVDA": ["nvidia", "jensen huang"],
+      "AMZN": ["amazon", "aws", "andy jassy"],
+      "GOOGL": ["alphabet", "google", "youtube"],
+      "META": ["meta platforms", "facebook", "instagram", "zuckerberg"]
+    },
+    "feed_refresh_min": 5,
+    "half_life_hours": 12,
+    "max_age_hours": 48,
+    "veto_threshold": 0.35,
+    "size_boost_max": 0.5
+  }
+}

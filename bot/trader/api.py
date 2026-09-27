@@ -92,6 +92,9 @@ class TraderAPI:
                 return self.positions()
             if path == "news":
                 return self.news()
+            if path == "research":
+                p = Path(__file__).resolve().parent.parent / "research_results.json"
+                return json.loads(p.read_text()) if p.exists() else {"rows": [], "strategies": {}}
             if path == "journal":
                 n = max(1, min(500, int(query.get("n", ["50"])[0])))
                 return tail_jsonl(e.journal, n)

@@ -19,6 +19,10 @@ class Signal:
     side: int = FLAT          # +1 buy, -1 sell, 0 no trade
     strength: float = 0.0     # 0..1 confidence
     reason: str = ""
+    tag: str = ""             # strategy that produced it (owns the trade in independent mode)
+    sl_atr: float | None = None   # per-strategy stop in ATRs (None = risk default)
+    tp_atr: float | None = None   # per-strategy target in ATRs (0 = no target, exit by rule)
+    sl_dist: float | None = None  # explicit stop distance in price (wins over sl_atr)
 
 
 @dataclass
@@ -48,6 +52,7 @@ class Position:
     comment: str = ""
     profit: float = 0.0
     price: float = 0.0            # current market price
+    cost: float = 0.0             # commission + financing paid so far (paper broker)
 
 
 @dataclass

@@ -79,6 +79,13 @@
       "label": "Wire: news bias, blackouts and calendar"
     },
     {
+      "src": "screenshots/narrow-lab.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Lab: researched strategies with sources and re-tested evidence"
+    },
+    {
       "src": "screenshots/wide-desk.png",
       "sizes": "1920x1080",
       "type": "image/png",
@@ -91,6 +98,13 @@
       "type": "image/png",
       "form_factor": "wide",
       "label": "Decision log"
+    },
+    {
+      "src": "screenshots/wide-lab.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Lab on desktop"
     }
   ],
   "shortcuts": [
@@ -120,6 +134,17 @@
       "name": "Log (decisions)",
       "short_name": "Log",
       "url": "/?tab=log",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Lab (strategy playbook)",
+      "short_name": "Lab",
+      "url": "/?tab=lab",
       "icons": [
         {
           "src": "icons/icon-192.png",

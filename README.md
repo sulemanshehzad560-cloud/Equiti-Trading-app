@@ -72,6 +72,28 @@ On first `run` or `demo`, the bot prints an **app access token** and saves it in
 `bot/.env` as `DASHBOARD_TOKEN`. On the same PC, open **http://localhost:8787** to use the app
 right away.
 
+### Stocks and indices (share CFDs)
+
+Equiti's share and index CFDs (`AAPL`, `NVDA`, `US500`, `NAS100`… with or without a suffix such
+as `.US` or `#`) are handled natively. The bot gives them the New York cash session (DST-aware),
+evaluates daily rules **10 minutes before the close**, and matches headlines by ticker and company
+name. Start from the stocks preset:
+
+```bash
+copy config.stocks.example.json config.json     # rsi2 + tsmom + xsmom on US500, US100 and 6 mega-caps, daily
+```
+
+**Researched strategies**, with sources and our re-test on real data in **[RESEARCH.md](RESEARCH.md)**:
+`rsi2` (Connors RSI(2) pullback), `tsmom` (time-series momentum), `xsmom` (cross-sectional 12-1
+momentum), `tom` (turn-of-the-month), `orb` (5-min opening range breakout), `imom` (market
+intraday momentum). With `"strategy_mode": "independent"` each strategy owns its own trades
+(tagged `xt:<name>`) and exits by its own rule.
+
+```bash
+python main.py research --fetch     # re-run the evidence tests on real SPY / stock / 154y S&P data
+python main.py backtest --csv US500_M5.csv --symbol US500 --strategies orb,imom --spread-pct 0.02 --tz Etc/GMT-3
+```
+
 ### What the bot does
 
 * **Strategies.** Three strategies vote on every closed bar. A weighted ensemble trades only
@@ -168,7 +190,10 @@ monospace wherever numbers live.
   currencies the parser scored.
 * **04 Log.** `tail -f` of the journal: every OPEN, EXIT, SKIP, REJ and SYS line with its
   reason and news context, filterable.
-* **Keys.** `1`–`4` tabs, `p` pause or resume, `r` refresh, `,` settings, `?` help. Flatten has no
+* **05 Lab.** The playbook: each enabled strategy's rules, published source, open positions and
+  measured evidence against buy and hold. Also the full evidence table, and the researched
+  strategies you haven't switched on.
+* **Keys.** `1`–`5` tabs, `p` pause or resume, `r` refresh, `,` settings, `?` help. Flatten has no
   hotkey on purpose. On a LIVE account you have to type `FLATTEN` to confirm.
 
 The app works offline for its shell, since the service worker caches it. Trading data always
@@ -184,7 +209,9 @@ browser: render `public/icons/icon.svg` at 192 and 512 px, then take the screens
 cd bot && python -m unittest discover -s tests -v
 ```
 
-There are 30 tests, covering the indicators, strategies, news parsing, sentiment and blackout,
+There are 42 tests. They cover the researched strategies (built on hand-made price paths),
+sessions and DST, stock headline parsing, the MT5 server-time conversion, the indicators, news
+parsing, sentiment and blackout,
 the engine's news veto and size boost, risk sizing, paper fills, the MT5 adapter (against a fake
 `MetaTrader5` module, so they pass on any OS), and the app API (auth, pause and resume,
 close-all, static file safety). GitHub Actions runs them on every push.

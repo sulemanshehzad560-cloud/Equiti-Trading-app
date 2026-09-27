@@ -23,7 +23,7 @@ TIMEFRAMES = ["M1", "M5", "M15", "M30", "H1", "H4", "D1"]
 class Broker:
     def connect(self): ...
     def shutdown(self): ...
-    def bars(self, symbol, timeframe, count): raise NotImplementedError
+    def bars(self, symbol, timeframe, count, include_forming=False): raise NotImplementedError
     def symbol_info(self, symbol): raise NotImplementedError
     def quote(self, symbol): raise NotImplementedError          # (bid, ask)
     def equity(self): raise NotImplementedError
@@ -47,6 +47,7 @@ class MT5Broker(Broker):
         self.mt5 = mt5
         self.login, self.password, self.server = int(login), password, server
         self.path, self.magic, self.deviation = terminal_path, magic, deviation
+        self.server_offset = 0     # seconds: MT5 stamps bars in broker server time, not UTC
 
     def connect(self):
         kw = dict(login=self.login, password=self.password, server=self.server, timeout=60000)
@@ -57,9 +58,21 @@ class MT5Broker(Broker):
         acc = self.mt5.account_info()
         log.info("connected to %s account %s (%s), balance %.2f %s", acc.server, acc.login,
                  "DEMO" if acc.trade_mode == self.mt5.ACCOUNT_TRADE_MODE_DEMO else "REAL", acc.balance, acc.currency)
+        self.server_offset = self._detect_offset()
+        log.info("broker server time is UTC%+.0fh", self.server_offset / 3600)
         if not self.mt5.terminal_info().trade_allowed:
             log.warning("Algo Trading is OFF in the MT5 terminal - enable the 'Algo Trading' button")
         return acc
+
+    def _detect_offset(self):
+        """Server time minus UTC, rounded to the hour, from the newest tick we can find."""
+        import time as _t
+        for sym in ("EURUSD", "XAUUSD", "US500", "GBPUSD"):
+            self.mt5.symbol_select(sym, True)
+            tick = self.mt5.symbol_info_tick(sym)
+            if tick and tick.time and abs(tick.time - _t.time()) < 86400:
+                return round((tick.time - _t.time()) / 3600) * 3600
+        return 0
 
     def is_demo(self):
         return self.mt5.account_info().trade_mode == self.mt5.ACCOUNT_TRADE_MODE_DEMO
@@ -70,13 +83,14 @@ class MT5Broker(Broker):
     def _tf(self, tf):
         return getattr(self.mt5, "TIMEFRAME_" + tf)
 
-    def bars(self, symbol, timeframe, count):
+    def bars(self, symbol, timeframe, count, include_forming=False):
         self.mt5.symbol_select(symbol, True)
-        # start_pos=1 skips the bar still forming, so strategies only see closed bars
-        rates = self.mt5.copy_rates_from_pos(symbol, self._tf(timeframe), 1, count)
+        # start_pos=1 skips the bar still forming, so strategies only see closed bars.
+        # Daily rules on share CFDs run just before the cash close and include today's bar as the close.
+        rates = self.mt5.copy_rates_from_pos(symbol, self._tf(timeframe), 0 if include_forming else 1, count)
         if rates is None:
             raise RuntimeError(f"no data for {symbol}: {self.mt5.last_error()}")
-        return [Bar(datetime.fromtimestamp(int(r["time"]), timezone.utc), float(r["open"]), float(r["high"]),
+        return [Bar(datetime.fromtimestamp(int(r["time"]) - self.server_offset, timezone.utc), float(r["open"]), float(r["high"]),
                     float(r["low"]), float(r["close"]), float(r["tick_volume"])) for r in rates]
 
     def symbol_info(self, symbol):
@@ -159,9 +173,14 @@ class PaperBroker(Broker):
     """Local simulation. Feed it bars with `on_bar` (backtest) or wrap another broker's
     data with `data_source` (dry run against live MT5 prices)."""
 
-    def __init__(self, balance=10000.0, spread_points=10, symbols=None, data_source=None):
+    def __init__(self, balance=10000.0, spread_points=10, symbols=None, data_source=None,
+                 spread_pct=None, commission_pct=0.0, financing_pct_annual=0.0):
         self.balance = balance
         self.spread_points = spread_points
+        self.spread_pct = spread_pct                    # e.g. 0.05 = 0.05% of price (share CFDs)
+        self.commission_pct = commission_pct            # per side, % of position value
+        self.financing_pct_annual = financing_pct_annual  # overnight funding on position value, per year
+        self.costs_paid = 0.0
         self.infos = symbols or {}
         self.data = data_source
         self.last = {}               # symbol -> last Bar
@@ -177,8 +196,8 @@ class PaperBroker(Broker):
         if self.data:
             self.data.shutdown()
 
-    def bars(self, symbol, timeframe, count):
-        bars = self.data.bars(symbol, timeframe, count)
+    def bars(self, symbol, timeframe, count, include_forming=False):
+        bars = self.data.bars(symbol, timeframe, count, include_forming=include_forming)
         if bars:
             self.on_bar(symbol, bars[-1])
         return bars
@@ -194,17 +213,23 @@ class PaperBroker(Broker):
         if self.data:
             return self.data.quote(symbol)
         info, c = self.symbol_info(symbol), self.last[symbol].close
+        if self.spread_pct is not None:          # percentage spread wins (0 = frictionless)
+            return c, round(c * (1 + self.spread_pct / 100), info.digits + 2)
         return c, c + self.spread_points * info.point
 
     def _pnl(self, pos, price):
         info = self.symbol_info(pos.symbol)
         return (price - pos.entry) * pos.side / info.tick_size * info.tick_value * pos.volume
 
+    def _notional(self, pos, price):
+        info = self.symbol_info(pos.symbol)
+        return price / info.tick_size * info.tick_value * pos.volume
+
     def equity(self):
         eq = self.balance
         for p in self.open_positions:
             if p.symbol in self.last:
-                eq += self._pnl(p, self.last[p.symbol].close)
+                eq += self._pnl(p, self.last[p.symbol].close) - p.cost
         return eq
 
     def account(self):
@@ -224,13 +249,16 @@ class PaperBroker(Broker):
         price = ask if req.side == BUY else bid
         when = self.last[req.symbol].time if req.symbol in self.last else datetime.now(timezone.utc)
         pos = Position(next(self._ids), req.symbol, req.side, req.volume, price, req.sl, req.tp, when, req.comment)
+        pos.cost = self._notional(pos, price) * self.commission_pct / 100
         self.open_positions.append(pos)
         log.info("PAPER open %s %s %.2f @ %.5f sl %.5f tp %.5f", "BUY" if req.side == BUY else "SELL",
                  req.symbol, req.volume, price, req.sl, req.tp)
         return pos
 
     def _exit(self, pos, price, when, reason):
-        pnl = self._pnl(pos, price)
+        pos.cost += self._notional(pos, price) * self.commission_pct / 100
+        self.costs_paid += pos.cost
+        pnl = self._pnl(pos, price) - pos.cost
         self.balance += pnl
         self.open_positions.remove(pos)
         self.closed.append((pos, price, when, pnl, reason))
@@ -249,10 +277,15 @@ class PaperBroker(Broker):
     def on_bar(self, symbol, bar):
         """Advance the simulation: check stop loss / take profit against the bar's range.
         If both are inside one bar the stop is assumed to hit first (conservative)."""
+        prev = self.last.get(symbol)
         self.last[symbol] = bar
+        new_day = prev is not None and bar.time.date() > prev.time.date()
         for pos in list(self.positions(symbol)):
             if pos.opened and bar.time <= pos.opened:
                 continue
+            if new_day and self.financing_pct_annual:     # overnight funding, per calendar night held
+                nights = (bar.time.date() - prev.time.date()).days
+                pos.cost += self._notional(pos, prev.close) * self.financing_pct_annual / 100 / 365 * nights
             if pos.side == BUY:
                 if pos.sl and bar.low <= pos.sl:
                     self._exit(pos, min(pos.sl, bar.open), bar.time, "stop loss")
@@ -267,6 +300,12 @@ class PaperBroker(Broker):
 
 def default_symbol_info(symbol):
     """Reasonable contract specs for a USD account when no broker is attached."""
+    from .markets import classify
+    kind, _, _ = classify(symbol)
+    if kind == "stock":      # share CFD: 1 lot = 1 share, $0.01 tick
+        return SymbolInfo(symbol, 0.01, 2, 0.01, 0.01, 1, 1, 10000, 1)
+    if kind == "index":      # index CFD: 1 lot = $1 per point
+        return SymbolInfo(symbol, 0.01, 2, 0.01, 0.01, 1, 0.1, 500, 0.1)
     s = symbol.upper()
     if s.startswith(("XAU", "GOLD")):
         return SymbolInfo(symbol, 0.01, 2, 0.01, 1.0, 100)
