@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Equiti Trader</title>
+  <meta name="description" content="Monitor and control your automated Equiti MT5 trading bot.">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="color-scheme" content="dark light">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><img src="icons/icon.svg" alt="" width="28" height="28"><span>Equiti Trader</span></div>
+    <span id="conn" class="pill">Not connected</span>
+    <button id="openSettings" class="icon-btn" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M3 17v2h6v-2zm0-12v2h10V5zm10 16v-2h8v-2h-8v-2h-2v6zM7 9v2H3v2h4v2h2V9zm14 4v-2H11v2zm-6-4h2V7h4V5h-4V3h-2z"/></svg>
+    </button>
+  </header>
+
+  <main id="main">
+    <section id="onboard" class="card onboard" hidden>
+      <h1>Connect your trading bot</h1>
+      <p>This app watches and controls the Equiti Trader bot running next to MetaTrader 5 on your PC or VPS.</p>
+      <ol>
+        <li>Start the bot: <code>python main.py run --mode demo</code></li>
+        <li>On the same PC, open <code>http://localhost:8787</code>. For your phone, share it over HTTPS (see README).</li>
+        <li>Open <b>Settings</b> here and paste the bot address and the access token the bot printed.</li>
+      </ol>
+      <div class="row">
+        <button class="btn primary" data-action="settings">Open settings</button>
+        <button class="btn" data-action="sample">Try with sample data</button>
+      </div>
+    </section>
+
+    <section id="tab-dashboard" class="tab">
+      <div class="grid">
+        <div class="card hero">
+          <div class="muted small">Equity</div>
+          <div id="equity" class="big">-</div>
+          <div class="kv">
+            <div><span class="muted">Balance</span><b id="balance">-</b></div>
+            <div><span class="muted">Today</span><b id="dayPnl">-</b></div>
+            <div><span class="muted">Open</span><b id="openCount">-</b></div>
+          </div>
+          <div class="muted small" id="accountLine"></div>
+        </div>
+        <div class="card">
+          <div class="row between">
+            <h2>Bot</h2>
+            <span id="modeBadge" class="badge">-</span>
+          </div>
+          <div id="botState" class="state">-</div>
+          <div class="row">
+            <button id="pauseBtn" class="btn">Pause new trades</button>
+            <button id="closeAllBtn" class="btn danger">Close all</button>
+          </div>
+          <p class="muted small">Pausing stops new entries. Open trades keep their stop loss and take profit.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Symbols</h2>
+        <ul id="symbolList" class="list"></ul>
+      </div>
+    </section>
+
+    <section id="tab-positions" class="tab" hidden>
+      <div id="positionsEmpty" class="card muted center" hidden>No open positions.</div>
+      <ul id="positionList" class="cards"></ul>
+    </section>
+
+    <section id="tab-news" class="tab" hidden>
+      <div class="card">
+        <h2>News filter by symbol</h2>
+        <ul id="newsSymbols" class="list"></ul>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h2>Upcoming events</h2>
+          <ul id="events" class="list"></ul>
+        </div>
+        <div class="card">
+          <h2>Currency mood</h2>
+          <div id="currencies" class="chips"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Latest headlines</h2>
+        <ul id="headlines" class="list"></ul>
+      </div>
+    </section>
+
+    <section id="tab-activity" class="tab" hidden>
+      <div class="card">
+        <div class="row between"><h2>Decisions</h2><label class="small"><input type="checkbox" id="hideSkips" checked> Hide skips</label></div>
+        <ul id="journal" class="list"></ul>
+      </div>
+    </section>
+
+    <p id="error" class="error" role="alert" hidden></p>
+  </main>
+
+  <nav class="tabs" aria-label="Sections">
+    <button data-tab="dashboard" class="active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4zm0 7h6v-5H4zm10 0h6v-9h-6zm0-16v5h6V4z"/></svg>Dashboard</button>
+    <button data-tab="positions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8v4h2V3h-8v2h4l-6 6-4-4-8 8z"/></svg>Positions</button>
+    <button data-tab="news"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13v13a3 3 0 0 0 3 3H6a2 2 0 0 1-2-2zm15 4h2v9a1 1 0 0 1-2 0zM7 7v4h7V7zm0 6v1.5h7V13zm0 3.5V18h7v-1.5z"/></svg>News</button>
+    <button data-tab="activity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4v2h-2.6L14 22 10 6l-1.6 6H3z"/></svg>Activity</button>
+  </nav>
+
+  <dialog id="settings">
+    <form method="dialog" id="settingsForm">
+      <h2>Settings</h2>
+      <label>Bot address
+        <input id="botUrl" type="url" placeholder="https://your-tunnel.trycloudflare.com" autocomplete="off">
+        <span class="muted small">Leave empty when this app is opened from the bot itself (http://localhost:8787).</span>
+      </label>
+      <label>Access token
+        <input id="botToken" type="password" autocomplete="off" spellcheck="false">
+        <span class="muted small">Printed by the bot on first start, and saved in its <code>.env</code> as DASHBOARD_TOKEN.</span>
+      </label>
+      <p id="testResult" class="small" aria-live="polite"></p>
+      <div class="row between">
+        <button type="button" id="testBtn" class="btn">Test</button>
+        <div class="row">
+          <button value="cancel" class="btn">Cancel</button>
+          <button value="save" id="saveBtn" class="btn primary">Save</button>
+        </div>
+      </div>
+      <hr>
+      <div class="row between">
+        <button type="button" id="sampleBtn" class="btn">Use sample data</button>
+        <button type="button" id="forgetBtn" class="btn danger">Forget token</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm">
+    <form method="dialog">
+      <h2 id="confirmTitle">Are you sure?</h2>
+      <p id="confirmText" class="muted"></p>
+      <div class="row end">
+        <button value="no" class="btn">Cancel</button>
+        <button value="yes" class="btn danger">Confirm</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

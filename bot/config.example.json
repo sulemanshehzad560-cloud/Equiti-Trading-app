@@ -1,0 +1,53 @@
+{
+  "symbols": ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD"],
+  "timeframe": "M15",
+  "history_bars": 300,
+  "poll_seconds": 20,
+  "magic": 260927,
+  "paper_balance": 10000,
+  "trading_hours_utc": [6, 20],
+  "exit_on_opposite_signal": true,
+  "journal": "logs/journal.jsonl",
+
+  "app": { "enabled": true, "host": "127.0.0.1", "port": 8787, "allow_origin": "*" },
+
+  "signal_threshold": 0.2,
+  "strategies": {
+    "trend":    { "enabled": true, "weight": 1.0, "fast": 20, "slow": 50, "adx_min": 22 },
+    "meanrev":  { "enabled": true, "weight": 1.0, "rsi_period": 14, "oversold": 30, "overbought": 70, "adx_max": 20 },
+    "breakout": { "enabled": true, "weight": 1.0, "channel": 20, "min_atr_push": 0.1 }
+  },
+
+  "risk": {
+    "risk_per_trade_pct": 0.5,
+    "max_lots_per_trade": 1.0,
+    "max_open_positions": 3,
+    "max_positions_per_symbol": 1,
+    "max_daily_loss_pct": 3.0,
+    "max_spread_points": 30,
+    "sl_atr_mult": 1.5,
+    "tp_atr_mult": 3.0,
+    "trail_atr_mult": 0
+  },
+
+  "news": {
+    "enabled": true,
+    "calendar_url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+    "calendar_refresh_min": 60,
+    "blackout_impacts": ["High"],
+    "blackout_before_min": 30,
+    "blackout_after_min": 30,
+    "always_watch": ["USD"],
+    "close_positions_before_event": false,
+    "feeds": [
+      "https://www.fxstreet.com/rss/news",
+      "https://www.investing.com/rss/news_1.rss",
+      "https://feeds.content.dowjones.io/public/rss/mw_marketpulse"
+    ],
+    "feed_refresh_min": 5,
+    "half_life_hours": 6,
+    "max_age_hours": 24,
+    "veto_threshold": 0.35,
+    "size_boost_max": 0.5
+  }
+}

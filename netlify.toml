@@ -1,0 +1,5 @@
+# The installable app (PWA) is a static site - no build step.
+# PWABuilder packages whatever URL this deploys to.
+[build]
+  publish = "public"
+  command = ""

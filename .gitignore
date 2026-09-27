@@ -1,0 +1,17 @@
+# secrets and local settings - never commit
+.env
+bot/.env
+bot/config.json
+# runtime output
+bot/logs/
+logs/
+*.csv
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+# PWABuilder downloads (contain your signing key!)
+*.keystore
+signing-key-info.txt
+*.aab
+*.apk

@@ -1,0 +1,3 @@
+# Only needed for --mode paper/demo/live (Windows, or Wine on Linux/macOS).
+# Backtests, news and tests run on the Python standard library alone.
+MetaTrader5>=5.0.45; platform_system == "Windows"
